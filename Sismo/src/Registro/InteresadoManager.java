@@ -1,15 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Registro;
 
-
- 
+import Modelo.*;
 import java.io.*;
 import java.util.*;
 
-public class InteresadoRepository {
+public class InteresadoManager {
     private List<Interesado> interesados = new ArrayList<>();
 
     public void cargarDesdeCSV(String rutaArchivo) throws IOException {
@@ -22,13 +17,21 @@ public class InteresadoRepository {
                 String nombre = partes[0].trim();
                 String email = partes[1].trim();
                 String celular = partes[2].trim();
-                Set<String> provincias = new HashSet<>(Arrays.asList(partes[3].split(";")));
+                Set<Provincia> provincias = new HashSet<>();
+                for (String provStr : partes[3].split(";")) {
+                    provStr = provStr.trim().toUpperCase().replace(" ", "_");
+                    try {
+                        provincias.add(Provincia.valueOf(provStr));
+                    } catch (IllegalArgumentException e) {
+                        // Puedes registrar un warning aquí si quieres
+                    }
+                }
                 interesados.add(new Interesado(nombre, email, celular, provincias));
             }
         }
     }
 
-    public List<Interesado> buscarPorProvincia(String provincia) {
+    public List<Interesado> buscarPorProvincia(Provincia provincia) {
         List<Interesado> result = new ArrayList<>();
         for (Interesado i : interesados) {
             if (i.leInteresa(provincia)) result.add(i);
