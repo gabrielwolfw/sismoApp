@@ -36,7 +36,32 @@ public class Sismo {
         this.zona = zona;
     }
 
-    // Getters y setters omitidos por brevedad
+    
+    // Getters
+    public LocalDate getFecha() { return fecha; }
+    public LocalTime getHora() { return hora; }
+    public double getProfundidad() { return profundidad; }
+    public Origen getOrigen() { return origen; }
+    public double getMagnitud() { return magnitud; }
+    public EscalaSismologica getEscala() { return escala; }
+    public double getLatitud() { return latitud; }
+    public double getLongitud() { return longitud; }
+    public String getDescripcionZona() { return descripcionZona; }
+    public Provincia getProvincia() { return provincia; }
+    public Zona getZona() { return zona; }
+
+    // Setters
+    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+    public void setHora(LocalTime hora) { this.hora = hora; }
+    public void setProfundidad(double profundidad) { this.profundidad = profundidad; }
+    public void setOrigen(Origen origen) { this.origen = origen; }
+    public void setMagnitud(double magnitud) { this.magnitud = magnitud; }
+    public void setEscala(EscalaSismologica escala) { this.escala = escala; }
+    public void setLatitud(double latitud) { this.latitud = latitud; }
+    public void setLongitud(double longitud) { this.longitud = longitud; }
+    public void setDescripcionZona(String descripcionZona) { this.descripcionZona = descripcionZona; }
+    public void setProvincia(Provincia provincia) { this.provincia = provincia; }
+    public void setZona(Zona zona) { this.zona = zona; }
 
     @Override
     public String toString() {
