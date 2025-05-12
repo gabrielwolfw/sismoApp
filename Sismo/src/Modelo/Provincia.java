@@ -11,5 +11,6 @@ public enum Provincia {
     HEREDIA,
     GUANACASTE,
     PUNTARENAS,
-    LIMON
+    LIMON,
+    SIN_ASIGNAR
 }
