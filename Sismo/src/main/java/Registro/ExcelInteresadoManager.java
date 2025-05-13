@@ -67,7 +67,7 @@ public class ExcelInteresadoManager {
         row.createCell(2).setCellValue(interesado.getCelular());
         // Provincias como string separado por ";"
         StringBuilder sb = new StringBuilder();
-        for (Provincia p : interesado.getProvincias()) {
+        for (Provincia p : interesado.getProvinciasInteres()) {
             if (sb.length() > 0) sb.append(";");
             sb.append(p.name());
         }

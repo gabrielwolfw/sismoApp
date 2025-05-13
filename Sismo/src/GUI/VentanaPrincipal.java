@@ -3,17 +3,25 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package GUI;
-import Modelo.Provincia;
+import Main.java.Registro.RegistroSismoExcel;
 import Modelo.Origen;
+import Modelo.Provincia;
 import Modelo.Sismo;
-
+import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.time.ZoneId;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
+
+import javax.swing.JButton;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import javax.swing.JOptionPane;
 import javax.swing.SpinnerDateModel;
+import javax.swing.table.DefaultTableModel;
+
 import com.toedter.calendar.JDateChooser;
+
 
 /**
  *
@@ -22,15 +30,39 @@ import com.toedter.calendar.JDateChooser;
 
 public class VentanaPrincipal extends javax.swing.JFrame {
 
+    private RegistroSismoExcel regExcel;
+    private JScrollPane        jScrollPaneTabla;
+    private DefaultTableModel  tblModel;
+
     public VentanaPrincipal() {
         initComponents();
+
+        // 1) Servicio Excel (ruta relativa al directorio de ejecución)
+        regExcel = new RegistroSismoExcel("archivos/interesados.xlsx");
+
+        // 2) Configuraciones de los spinners y combos
         configurarSpinnerHora();
         cargarProvincias();
         cargarOrigenes();
+
+        // 3) Inicializar y vincular la JTable
+        tblSismos = new JTable();
+        jScrollPaneTabla = new JScrollPane();       // Si lo añadiste en GUI Builder, quita esta línea
+        // Si ya tenías un JScrollPane en el designer llamado jScrollPaneTabla,
+        // omite la creación nueva y usa directamente esa referencia.
+        jScrollPaneTabla.setViewportView(tblSismos);
+        // Si lo pusiste en el GUI Builder, asegúrate de que dentro de initComponents
+        // ya está jScrollPaneTabla y elimina la línea anterior.
+
+        // 4) Cargar datos iniciales
+        cargarTabla();
+
+        // 5) Listeners de botones
         btnGuardar.addActionListener(evt -> guardarSismo());
+        btnBorrar .addActionListener(evt -> limpiarFormulario());
     }
-    
-       private void configurarSpinnerHora() {
+
+    private void configurarSpinnerHora() {
         spinnerHora.setModel(new SpinnerDateModel());
         JSpinner.DateEditor editor = new JSpinner.DateEditor(spinnerHora, "HH:mm:ss");
         spinnerHora.setEditor(editor);
@@ -58,6 +90,38 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         cmbOrigen.setSelectedIndex(0);
     }
 
+    private void cargarTabla() {
+        try {
+            List<Sismo> lista = regExcel.cargarSismos();
+            String[] columnas = {
+                "Fecha","Hora","Profundidad","Origen",
+                "Magnitud","Escala","Latitud","Longitud",
+                "Descripción","Provincia","Zona"
+            };
+            tblModel = new DefaultTableModel(columnas, 0);
+            for (Sismo s : lista) {
+                tblModel.addRow(new Object[]{
+                    s.getFecha(),
+                    s.getHora(),
+                    s.getProfundidad(),
+                    s.getOrigen(),
+                    s.getMagnitud(),
+                    s.getEscala(),
+                    s.getLatitud(),
+                    s.getLongitud(),
+                    s.getDescripcionZona(),
+                    s.getProvincia(),
+                    s.getZona()    // si Sismo tiene getZona()
+                });
+            }
+            tblSismos.setModel(tblModel);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this,
+                "Error cargando Excel:\n" + ex.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private void guardarSismo() {
         try {
             Sismo s = new Sismo();
@@ -72,11 +136,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
             // parsear origen desde String
             String origenStr = (String) cmbOrigen.getSelectedItem();
-            for (Origen o : Origen.values())
+            for (Origen o : Origen.values()) {
                 if (o.toString().equals(origenStr)) {
                     s.setOrigen(o);
                     break;
                 }
+            }
 
             s.setMagnitud(Double.parseDouble(txtMagnitud.getText()));
             s.setLatitud(Double.parseDouble(txtLatitud.getText()));
@@ -84,13 +149,19 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
             // parsear provincia desde String
             String provStr = (String) cmbProvincia.getSelectedItem();
-            for (Provincia p : Provincia.values())
+            for (Provincia p : Provincia.values()) {
                 if (p.toString().equals(provStr)) {
                     s.setProvincia(p);
                     break;
                 }
+            }
 
             s.setDescripcionZona(txtDescripcionZona.getText());
+
+            // Persistir en el Excel y refrescar la tabla
+            regExcel.agregarSismo(s);
+            cargarTabla();
+            limpiarFormulario();
 
             JOptionPane.showMessageDialog(this,
                 "Sismo guardado:\n" +
@@ -117,6 +188,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         txtDescripcionZona.setText("");
     }
 
+
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() ->
             new VentanaPrincipal().setVisible(true)
@@ -134,8 +206,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         lblImagen = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jScrollBar1 = new javax.swing.JScrollBar();
-        tabsMain = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         btnGuardar = new javax.swing.JButton();
@@ -158,6 +228,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         spinnerHora = new javax.swing.JSpinner();
         jDateChooser1 = new com.toedter.calendar.JDateChooser();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblSismos = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(204, 204, 255));
@@ -170,12 +242,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI Variable", 0, 18)); // NOI18N
         jLabel1.setText("Reporte un sismo y ayude al OBVSICORI y a la RSN");
-
-        jScrollBar1.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentMoved(java.awt.event.ComponentEvent evt) {
-                jScrollBar1ComponentMoved(evt);
-            }
-        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI Variable", 0, 18)); // NOI18N
         jLabel2.setText("Magnitud del Sismo:");
@@ -348,59 +414,67 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
                 .addComponent(txtMagnitud, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGuardar)
                     .addComponent(btnBorrar))
                 .addGap(49, 49, 49))
         );
 
+        tblSismos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(tblSismos);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(285, 285, 285)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(107, 107, 107)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(391, 391, 391)
-                                .addComponent(jLabel1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(367, 367, 367)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(201, 201, 201)
-                        .addComponent(tabsMain, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(141, 141, 141)
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(255, 255, 255))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 823, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(166, 166, 166)))))
-                .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jScrollPane1)
+                            .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 582, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(29, 29, 29))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(41, 41, 41)
+                .addContainerGap()
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(456, 456, 456)
-                        .addComponent(tabsMain, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(39, 39, 39)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(69, 69, 69)
+                        .addGap(18, 18, 18)
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(26, Short.MAX_VALUE))
-            .addComponent(jScrollBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(28, 28, 28))))
         );
 
         pack();
@@ -409,10 +483,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnGuardarActionPerformed
-
-    private void jScrollBar1ComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jScrollBar1ComponentMoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jScrollBar1ComponentMoved
 
     private void txtMagnitudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMagnitudActionPerformed
         // TODO add your handling code here:
@@ -467,10 +537,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollBar jScrollBar1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblImagen;
     private javax.swing.JSpinner spinnerHora;
-    private javax.swing.JTabbedPane tabsMain;
+    private javax.swing.JTable tblSismos;
     private javax.swing.JTextField txtDescripcionZona;
     private javax.swing.JTextField txtLatitud;
     private javax.swing.JTextField txtLongitud;

@@ -5,14 +5,17 @@
 package Modelo;
 
 import Modelo.Sismo;
+import java.util.List;
 
 /**
  *
  * @author mishe
  */
 public class SismosExcelDAO {
-    private Path archivo = Paths.get("resources/sismos.xlsx");
-    public List<Sismo> cargarTodos() { /* Apache POI: leer rows */ }
+    private Path archivo = Paths.get("recursos/interesados.xlsx");
+    public List<Sismo> cargarTodos() { /* Apache POI: leer rows */
+        return null;
+    }
     public void guardar(Sismo s) { /* añadir row y escribir */ }
     public void actualizar(int fila, Sismo s) { /* modificar row */ }
 }
