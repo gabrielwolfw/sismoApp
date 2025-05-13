@@ -1,15 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Modelo;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 public class Sismo {
-    private LocalDate fecha;
-    private LocalTime hora;
+    private Fecha fecha;
+    private Hora hora;
     private double profundidad; // en kilómetros
     private Origen origen;
     private double magnitud;
@@ -20,7 +13,7 @@ public class Sismo {
     private Provincia provincia;    // puede ser SIN_ASIGNAR
     private Zona zona;
 
-    public Sismo(LocalDate fecha, LocalTime hora, double profundidad, Origen origen, double magnitud,
+    public Sismo(Fecha fecha, Hora hora, double profundidad, Origen origen, double magnitud,
                  EscalaSismologica escala, double latitud, double longitud, String descripcionZona,
                  Provincia provincia, Zona zona) {
         this.fecha = fecha;
@@ -36,10 +29,9 @@ public class Sismo {
         this.zona = zona;
     }
 
-    
     // Getters
-    public LocalDate getFecha() { return fecha; }
-    public LocalTime getHora() { return hora; }
+    public Fecha getFecha() { return fecha; }
+    public Hora getHora() { return hora; }
     public double getProfundidad() { return profundidad; }
     public Origen getOrigen() { return origen; }
     public double getMagnitud() { return magnitud; }
@@ -51,8 +43,8 @@ public class Sismo {
     public Zona getZona() { return zona; }
 
     // Setters
-    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
-    public void setHora(LocalTime hora) { this.hora = hora; }
+    public void setFecha(Fecha fecha) { this.fecha = fecha; }
+    public void setHora(Hora hora) { this.hora = hora; }
     public void setProfundidad(double profundidad) { this.profundidad = profundidad; }
     public void setOrigen(Origen origen) { this.origen = origen; }
     public void setMagnitud(double magnitud) { this.magnitud = magnitud; }

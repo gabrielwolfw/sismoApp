@@ -1,7 +1,6 @@
 package Registro;
 
 import Modelo.*;
-import java.time.LocalDate;
 import java.util.*;
 
 public class EstadisticasSismos {
@@ -21,11 +20,12 @@ public class EstadisticasSismos {
         return mapa;
     }
 
-    public static List<Sismo> filtrarSismosPorFecha(List<Sismo> sismos, LocalDate inicio, LocalDate fin) {
+    // Nuevo método: comparar fechas usando la clase Fecha (implementa un método compareTo en Fecha)
+    public static List<Sismo> filtrarSismosPorFecha(List<Sismo> sismos, Fecha inicio, Fecha fin) {
         List<Sismo> filtrados = new ArrayList<>();
         for (Sismo s : sismos) {
-            if ((s.getFecha().isEqual(inicio) || s.getFecha().isAfter(inicio)) &&
-                (s.getFecha().isEqual(fin) || s.getFecha().isBefore(fin))) {
+            Fecha fecha = s.getFecha();
+            if ((fecha.compareTo(inicio) >= 0) && (fecha.compareTo(fin) <= 0)) {
                 filtrados.add(s);
             }
         }
@@ -35,8 +35,9 @@ public class EstadisticasSismos {
     public static Map<Integer, Integer> contarSismosPorMes(List<Sismo> sismos, int year) {
         Map<Integer, Integer> mapa = new HashMap<>();
         for (Sismo s : sismos) {
-            if (s.getFecha().getYear() == year) {
-                int mes = s.getFecha().getMonthValue();
+            Fecha fecha = s.getFecha();
+            if (fecha.getAnno() == year) {
+                int mes = fecha.getMes();
                 mapa.put(mes, mapa.getOrDefault(mes, 0) + 1);
             }
         }
