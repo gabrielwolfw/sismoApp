@@ -1,0 +1,10 @@
+com\mycompany\sismos\excel\EditorExcel.class
+modelo\ZONA.class
+modelo\Sismos.class
+modelo\Provincia.class
+modelo\Hora.class
+modelo\Localizacion.class
+modelo\Sismo.class
+modelo\ESCALA.class
+modelo\ORIGEN.class
+modelo\Fecha.class
