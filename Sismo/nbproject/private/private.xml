@@ -3,11 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/mishe/OneDrive/Documentos/GitHub/sismoApp/Sismo/src/Modelo/SismosExcelDAO.java</file>
-            <file>file:/C:/Users/mishe/OneDrive/Documentos/GitHub/sismoApp/Sismo/src/Modelo/Origen.java</file>
-            <file>file:/C:/Users/mishe/OneDrive/Documentos/GitHub/sismoApp/Sismo/src/Modelo/Sismo.java</file>
-            <file>file:/C:/Users/mishe/OneDrive/Documentos/GitHub/sismoApp/Sismo/src/Modelo/Provincia.java</file>
-            <file>file:/C:/Users/mishe/OneDrive/Documentos/GitHub/sismoApp/Sismo/src/GUI/VentanaPrincipal.java</file>
+            <file>file:/C:/Users/lobok/Documents/sismoApp/Sismo/src/Registro/Sismo.java</file>
+            <file>file:/C:/Users/lobok/Documents/sismoApp/Sismo/src/Registro/PersonaInteresada.java</file>
+            <file>file:/C:/Users/lobok/Documents/sismoApp/Sismo/src/Registro/Interesados.java</file>
         </group>
     </open-files>
 </project-private>
