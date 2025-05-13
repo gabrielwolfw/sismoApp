@@ -1,4 +1,4 @@
-package Registro;
+package Main.java.Registro;
 
 import Modelo.*;
 import org.apache.poi.ss.usermodel.*;

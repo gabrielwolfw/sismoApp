@@ -6,12 +6,13 @@ package GUI;
 import Modelo.Provincia;
 import Modelo.Origen;
 import Modelo.Sismo;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
+
 import java.util.Date;
+import java.time.ZoneId;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
 import com.toedter.calendar.JDateChooser;
 
 /**
@@ -29,49 +30,97 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         btnGuardar.addActionListener(evt -> guardarSismo());
     }
     
-    private void configurarSpinnerHora() {
+       private void configurarSpinnerHora() {
+        spinnerHora.setModel(new SpinnerDateModel());
         JSpinner.DateEditor editor = new JSpinner.DateEditor(spinnerHora, "HH:mm:ss");
         spinnerHora.setEditor(editor);
     }
 
     private void cargarProvincias() {
-        DefaultComboBoxModel<Provincia> model = new DefaultComboBoxModel<>(Provincia.values());
-        cmbProvincia.setModel(model);
-        cmbProvincia.setSelectedItem(Provincia.SIN_ASIGNAR);
-    }
-
-    private void cargarOrigenes() {
-        DefaultComboBoxModel<OrigenFalla> model = new DefaultComboBoxModel<>(OrigenFalla.values());
-        cmbOrigen.setModel(model);
-        cmbOrigen.setSelectedIndex(0);
-    }
-    
-    private void guardarSismo() {
-        try {
-            Sismo s = new Sismo();
-            Date fecha = jDateChooser1.getDate();
-            s.setFecha(fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-            Date hora = (Date) spinnerHora.getValue();
-            s.setHora(hora.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
-            s.setProfundidadKm(Double.parseDouble(txtProfundidad.getText()));
-            s.setOrigen((OrigenFalla) cmbOrigen.getSelectedItem());
-            // Magnitud y escala dentro de Sismo
-            s.setMagnitud(Double.parseDouble(txtMagnitud.getText()));
-            s.setLatitud(Double.parseDouble(txtLatitud.getText()));
-            s.setLongitud(Double.parseDouble(txtLongitud.getText()));
-            s.setProvincia((Provincia) cmbProvincia.getSelectedItem());
-            s.setDescripcionZona(txtDescripcionZona.getText());
-
-            JOptionPane.showMessageDialog(this, "Sismo guardado:\n" +
-                    "Fecha: " + s.getFecha() + " " + s.getHora() + "\n" +
-                    "Magnitud: " + s.getMagnitud() + " " + s.getEscala());
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al guardar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        cmbProvincia.removeAllItems();
+        for (Provincia p : Provincia.values()) {
+            cmbProvincia.addItem(p.toString());
+        }
+        // seleccionar SIN ASIGNAR
+        for (int i = 0; i < cmbProvincia.getItemCount(); i++) {
+            if (cmbProvincia.getItemAt(i).equals(Provincia.SIN_ASIGNAR.toString())) {
+                cmbProvincia.setSelectedIndex(i);
+                break;
+            }
         }
     }
 
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> new VentanaPrincipal().setVisible(true));
+    private void cargarOrigenes() {
+        cmbOrigen.removeAllItems();
+        for (Origen o : Origen.values()) {
+            cmbOrigen.addItem(o.toString());
+        }
+        cmbOrigen.setSelectedIndex(0);
+    }
+
+    private void guardarSismo() {
+        try {
+            Sismo s = new Sismo();
+
+            Date fecha = jDateChooser1.getDate();
+            s.setFecha(fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+            Date hora = (Date) spinnerHora.getValue();
+            s.setHora(hora.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
+
+            s.setProfundidad(Double.parseDouble(txtProfundidad.getText()));
+
+            // parsear origen desde String
+            String origenStr = (String) cmbOrigen.getSelectedItem();
+            for (Origen o : Origen.values())
+                if (o.toString().equals(origenStr)) {
+                    s.setOrigen(o);
+                    break;
+                }
+
+            s.setMagnitud(Double.parseDouble(txtMagnitud.getText()));
+            s.setLatitud(Double.parseDouble(txtLatitud.getText()));
+            s.setLongitud(Double.parseDouble(txtLongitud.getText()));
+
+            // parsear provincia desde String
+            String provStr = (String) cmbProvincia.getSelectedItem();
+            for (Provincia p : Provincia.values())
+                if (p.toString().equals(provStr)) {
+                    s.setProvincia(p);
+                    break;
+                }
+
+            s.setDescripcionZona(txtDescripcionZona.getText());
+
+            JOptionPane.showMessageDialog(this,
+                "Sismo guardado:\n" +
+                "Fecha: " + s.getFecha() + " " + s.getHora() + "\n" +
+                "Magnitud: " + s.getMagnitud() + " " + s.getEscala()
+            );
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                "Error al guardar: " + ex.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private void limpiarFormulario() {
+        jDateChooser1.setDate(null);
+        spinnerHora.setValue(new Date());
+        txtProfundidad.setText("");
+        cmbOrigen.setSelectedIndex(0);
+        txtMagnitud.setText("");
+        txtLatitud.setText("");
+        txtLongitud.setText("");
+        cmbProvincia.setSelectedIndex(0);
+        txtDescripcionZona.setText("");
+    }
+
+    public static void main(String[] args) {
+        java.awt.EventQueue.invokeLater(() ->
+            new VentanaPrincipal().setVisible(true)
+        );
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -88,7 +137,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jScrollBar1 = new javax.swing.JScrollBar();
         tabsMain = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
-        jDateChooser1 = new com.toedter.calendar.JDateChooser();
         jLabel2 = new javax.swing.JLabel();
         btnGuardar = new javax.swing.JButton();
         btnBorrar = new javax.swing.JButton();
@@ -109,6 +157,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         txtDescripcionZona = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         spinnerHora = new javax.swing.JSpinner();
+        jDateChooser1 = new com.toedter.calendar.JDateChooser();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(204, 204, 255));
@@ -145,7 +194,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             }
         });
 
-        txtMagnitud.setText("jTextField1");
         txtMagnitud.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtMagnitudActionPerformed(evt);
@@ -155,12 +203,14 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Segoe UI Variable", 0, 18)); // NOI18N
         jLabel4.setText("Fecha del Sismo:");
 
-        txtLongitud.setText("jTextField1");
-
         jLabel5.setFont(new java.awt.Font("Segoe UI Variable", 0, 18)); // NOI18N
         jLabel5.setText("Latitud");
 
-        txtLatitud.setText("jTextField1");
+        txtLatitud.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtLatitudActionPerformed(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Segoe UI Variable", 0, 18)); // NOI18N
         jLabel6.setText("Longitud del Sismo:");
@@ -181,7 +231,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jLabel10.setFont(new java.awt.Font("Segoe UI Variable", 0, 18)); // NOI18N
         jLabel10.setText("Descripcion de la zona");
 
-        txtProfundidad.setText("jTextField1");
         txtProfundidad.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtProfundidadActionPerformed(evt);
@@ -191,7 +240,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jLabel11.setFont(new java.awt.Font("Segoe UI Variable", 0, 18)); // NOI18N
         jLabel11.setText("Profundidad");
 
-        txtDescripcionZona.setText("jTextField1");
         txtDescripcionZona.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtDescripcionZonaActionPerformed(evt);
@@ -217,11 +265,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                     .addComponent(jLabel9)
                     .addComponent(txtLongitud, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6)
-                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
                     .addComponent(cmbOrigen, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11)
-                    .addComponent(txtProfundidad, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtProfundidad, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jDateChooser1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGap(124, 124, 124)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -233,12 +282,14 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                                 .addComponent(jLabel5)
                                 .addComponent(txtLatitud, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(txtDescripcionZona, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(44, 44, 44))
-                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(spinnerHora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(spinnerHora, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -262,7 +313,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
                         .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(36, 36, 36)
+                        .addGap(32, 32, 32)
                         .addComponent(jLabel6)
                         .addGap(18, 18, 18)
                         .addComponent(txtLongitud, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -387,6 +438,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         cmbProvincia.setSelectedItem(Provincia.SIN_ASIGNAR);
         txtDescripcionZona.setText("");
     }//GEN-LAST:event_btnBorrarActionPerformed
+
+    private void txtLatitudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLatitudActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLatitudActionPerformed
 
     /**
      * @param args the command line arguments

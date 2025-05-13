@@ -36,6 +36,10 @@ public class Sismo {
         this.zona = zona;
     }
 
+        public Sismo() {
+        // Inicializa aquí valores por defecto si quieres:
+        this.provincia = Provincia.SIN_ASIGNAR;
+    }
     
     // Getters
     public LocalDate getFecha() { return fecha; }
