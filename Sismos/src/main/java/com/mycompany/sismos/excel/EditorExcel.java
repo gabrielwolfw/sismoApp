@@ -19,9 +19,10 @@ public class EditorExcel {
     public void cargarExcel(ArrayList<Sismo> listaSismo){
         Workbook workbook = new XSSFWorkbook(); // Archivo .xlsx
         Sheet hoja = workbook.createSheet("Datos");
-        for(Sismo sismo:listaSismo){
-            for(int i=0;i<listaSismo.size();i++){
-                
+        int i=0;
+        
+            while(i<listaSismo.size()){
+                for(Sismo sismo:listaSismo){
                     Row fila = hoja.createRow(i);
                 
                     for(int o=0;o<7;o++){
@@ -49,12 +50,9 @@ public class EditorExcel {
                         case 6:
                             celda.setCellValue(sismo.getLocalizacion().toString());
                             break;
-                    }
-                
-                
-                    
+                    }  
                 }
-            }try (FileOutputStream fileOut = new FileOutputStream("InfoSismos.xlsx")) {
+            i++;}try (FileOutputStream fileOut = new FileOutputStream("InfoSismos.xlsx")) {
                 workbook.write(fileOut);
                 }catch (IOException e) {
                     e.printStackTrace();
