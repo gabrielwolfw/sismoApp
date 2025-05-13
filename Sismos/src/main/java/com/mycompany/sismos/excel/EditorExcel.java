@@ -44,28 +44,5 @@ public class EditorExcel {
                     e.printStackTrace();
                 }  
         }
-        
-/*else{
-                    try (FileInputStream fis = new FileInputStream("ejemplo.xlsx");
-                        Workbook workbook2 = new XSSFWorkbook(fis)){
-                    }
-                    
-                    
-                } 
-        
-            System.out.println("Archivo creado exitosamente.");
-        
-        
-
-            Sheet hoja = workbook.getSheetAt(0);
-            Row fila = hoja.getRow(0);
-            Cell celda = fila.createCell(1); // Crear nueva celda en columna B
-            celda.setCellValue("Editado!");
-
-            try (FileOutputStream fos = new FileOutputStream("ejemplo.xlsx")) {
-                workbook.write(fos);
-                System.out.println("Archivo editado exitosamente.");
-            }
-        */
     }
 
